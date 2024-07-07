@@ -1,4 +1,3 @@
-
 # Use uma imagem base adequada para seu aplicativo Node.js
 FROM node:20.15.0
 
@@ -18,5 +17,9 @@ RUN --mount=type=cache,id=dL67lOCPOLk-/root/local/share/pnpm/store/v3,target=/ro
 # Copiar o restante do código-fonte para o contêiner
 COPY . .
 
+# Expor a porta que o aplicativo utilizará
+EXPOSE 3002
+
 # Comando de inicialização do aplicativo
 CMD [ "node", "dist/index.js" ]
+
