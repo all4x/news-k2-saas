@@ -1,21 +1,11 @@
-version: '3.8'
 services:
   app:
     build:
       context: .
     ports:
-      - "3002:3002"
+      - "3002:3032"
     environment:
       - NODE_ENV=production
-    depends_on:
-      - pnpm-cache
-    networks:
-      - dokploy-network
-
-  pnpm-cache:
-    image: lucet/xx
-    volumes:
-      - /app/pnpm-store
     networks:
       - dokploy-network
 
