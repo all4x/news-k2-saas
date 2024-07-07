@@ -21,7 +21,6 @@ async function scrapeData(): Promise<Article[] | undefined> {
 
     const articles: Article[] = [];
 
-    // Seleciona todos os elementos que correspondem aos contêineres de notícias
     $('.elementor.elementor-527201.e-loop-item').each((index, element) => {
       if (index < 10) { // Limita a 10 artigos
         const title = $(element).find('h3').text().trim(); // Extrai o título da notícia
