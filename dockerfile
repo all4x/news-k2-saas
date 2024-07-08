@@ -17,7 +17,7 @@ COPY . .
 RUN pnpm run build
 
 # Verificar conteúdo da pasta dist após compilação
-RUN ls -la /app/dist
+RUN ls -la /app/dist/
 
 # Etapa 2: Execução
 FROM node:20.15.0
