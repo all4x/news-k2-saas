@@ -1,15 +1,23 @@
+
 services:
   app:
-    build:
-      context: .
+    build: .
     ports:
-      - "3002:3032"
+      - "3032:3032"
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["pnpm", "run", "start"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`${NEWS_HOST}`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.services.app.loadbalancer.server.port=${NEWS_PORT}"
     networks:
       - dokploy-network
 
 networks:
   dokploy-network:
     external: true
-

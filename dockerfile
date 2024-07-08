@@ -1,25 +1,23 @@
-# Use uma imagem base adequada para seu aplicativo Node.js
+# Use uma imagem base do Node.js estável
 FROM node:20.15.0
 
-# Configuração do ambiente
-ENV NIXPACKS_PATH /app/node_modules/.bin:$NIXPACKS_PATH
-
-# Configuração de diretório de trabalho
+# Criação de diretório de trabalho
 WORKDIR /app
 
-# Copiar package.json e pnpm-lock.yaml para o contêiner
+# Instalação de dependências usando pnpm
 COPY package.json pnpm-lock.yaml ./
 
-# Instalar dependências usando pnpm com --frozen-lockfile
-RUN --mount=type=cache,id=dL67lOCPOLk-/root/local/share/pnpm/store/v3,target=/root/.local/share/pnpm/store/v3 \
-  pnpm install --frozen-lockfile
+RUN npm install -g pnpm@latest && pnpm install --prod
 
-# Copiar o restante do código-fonte para o contêiner
+# Copia o código-fonte para o contêiner
 COPY . .
 
-# Expor a porta que o aplicativo utilizará
-EXPOSE 3002
+# Compilação do código TypeScript (assumindo que já foi transpilado)
+RUN pnpm run build
 
-# Comando de inicialização do aplicativo
-CMD [ "node", "dist/index.js" ]
+# Expor a porta que o aplicativo utilizará
+EXPOSE 3032
+
+# Comando para executar o aplicativo
+CMD ["pnpm","run", "start"]
 

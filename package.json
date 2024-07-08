@@ -4,17 +4,17 @@
   "dependencies": {
     "axios": "^1.7.2",
     "cheerio": "1.0.0-rc.12",
-    "fastify": "^4.28.1"
+    "fastify": "^4.28.1",
+    "@swc/cli": "^0.4.0",
+    "@swc/core": "^1.6.13"
   },
   "devDependencies": {
-    "@swc/cli": "^0.4.0",
-    "@swc/core": "^1.6.13",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "nodemon": "^2.0.22"
   },
   "scripts": {
     "build": "swc src -d dist",
-    "start": "node dist/index.js",
-    "dev": "swc src/index.ts -o dist/index.js && node dist/index.js",
-    "postinstall": "pnpm install --frozen-lockfile"
+    "start": "node dist/src/index.js",
+    "dev": "swc src/index.ts -o dist/index.js && node dist/index.js"
   }
 }
