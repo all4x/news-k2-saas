@@ -6,7 +6,8 @@ services:
     ports:
       - "3032:3032"
     environment:
-      NODE_ENV: production
+      env_file:
+      - .env
     volumes:
       - .:/app
     command: ["pnpm", "run", "start"]
