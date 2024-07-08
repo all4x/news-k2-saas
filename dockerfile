@@ -1,23 +1,40 @@
-# Use uma imagem base do Node.js estável
-FROM node:20.15.0
 
-# Criação de diretório de trabalho
+# Etapa 1: Compilação
+FROM node:20.15.0 AS build
+
+# Definir diretório de trabalho
 WORKDIR /app
 
-# Instalação de dependências usando pnpm
+# Copiar arquivos de dependências
 COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm@latest && pnpm install --prod
+# Instalar pnpm e dependências de produção e desenvolvimento
+RUN npm install -g pnpm@latest && pnpm install
 
-# Copia o código-fonte para o contêiner
+# Copiar o restante do código
 COPY . .
 
-# Compilação do código TypeScript (assumindo que já foi transpilado)
+# Compilar o código TypeScript
 RUN pnpm run build
+
+# Etapa 2: Execução
+FROM node:20.15.0
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar somente os artefatos necessários da etapa de compilação
+COPY --from=build /app .
+
+# Instalar apenas as dependências de produção
+RUN npm install -g pnpm@latest && pnpm install --prod
 
 # Expor a porta que o aplicativo utilizará
 EXPOSE 3032
 
+# Definir a variável de ambiente NODE_ENV como produção
+ENV NODE_ENV=production
+
 # Comando para executar o aplicativo
-CMD ["pnpm","run", "start"]
+CMD ["pnpm", "run", "start"]
 
