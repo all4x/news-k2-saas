@@ -1,4 +1,3 @@
-# Etapa 1: Compilação
 FROM node:20.15.0 AS build
 
 # Definir diretório de trabalho
