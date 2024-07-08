@@ -56,7 +56,11 @@ fastify.get('/news', async (request, reply) => {
 // Iniciar o servidor Fastify
 const start = async () => {
   try {
-    await fastify.listen({ port: 80 });
+    await fastify.listen({
+      host: '0.0.0.0',
+      port: process.env.PORT ? Number(process.env.PORT) : 3333
+
+    });
     fastify.log.info(`Servidor Fastify rodando em http://localhost:80`);
   } catch (err) {
     fastify.log.error(`Erro ao iniciar o servidor: ${err}`);
