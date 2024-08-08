@@ -9,6 +9,12 @@ interface Article {
   time: string;
 }
 
+interface ArticleContent {
+  title: string;
+  cleanContent: string;
+  img?: string;
+}
+
 const fastify = Fastify({
   logger: true
 });
@@ -43,6 +49,42 @@ async function scrapeData(): Promise<Article[] | undefined> {
   }
 }
 
+async function scrapeContent(url: string): Promise<ArticleContent | undefined> {
+
+  function limparTextoSemLinks(texto: string): string {
+    // Remove links
+    texto = texto.replace(/https?:\/\/\S+/g, '');
+    // Remove tags HTML
+    texto = texto.replace(/<[^>]*>/g, '');
+    // Remove espaços em branco extras
+    texto = texto.replace(/\s+/g, ' ').trim();
+    return texto;
+  }
+
+  try {
+    const response = await axios.get(url);
+    const $ = cheerio.load(response.data);
+
+    const title = $('h1').text().trim();
+    const img = $('img').first().attr('src');
+    let content = $('.elementor-widget-container').text().trim(); // Seleciona o conteúdo pela classe
+
+    // Limpa o conteúdo de espaços extras e quebras de linha
+    content = content.replace(/\n\s*\n/g, '\n').trim();
+
+    const cleanContent = limparTextoSemLinks(content)
+
+    if (title && content) {
+      return { title, img, cleanContent };
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    console.error('Erro ao fazer web scraping do conteúdo:', error);
+    return undefined;
+  }
+}
+
 // Rota para retornar as últimas 10 notícias
 fastify.get('/news', async (request, reply) => {
   const news = await scrapeData();
@@ -50,6 +92,23 @@ fastify.get('/news', async (request, reply) => {
     return news;
   } else {
     reply.code(500).send({ error: 'Erro ao obter notícias.' });
+  }
+});
+
+// Rota para pegar o conteúdo da notícia
+fastify.get('/news-content', async (request, reply) => {
+  const { url } = request.query as { url: string };
+  if (!url) {
+    reply.code(400).send({ error: 'URL da notícia é necessária.' });
+    return;
+  }
+
+  const content = await scrapeContent(url);
+  console.log(content)
+  if (content) {
+    return content;
+  } else {
+    reply.code(500).send({ error: 'Erro ao obter conteúdo da notícia.' });
   }
 });
 
