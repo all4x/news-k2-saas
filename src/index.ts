@@ -91,13 +91,12 @@ fastify.get('/news', async (request, reply) => {
 });
 
 // Rota para pegar o conteúdo da notícia
-fastify.get('/news-content', async (request, reply) => {
+fastify.post('/news-content', async (request, reply) => {
   const { url } = request.query as { url: string };
   if (!url) {
     reply.code(400).send({ error: 'URL da notícia é necessária.' });
     return;
   }
-
   const content = await scrapeContent(url);
   if (content) {
     return content;
