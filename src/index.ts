@@ -91,7 +91,7 @@ fastify.get('/news', async (request, reply) => {
 });
 
 // Rota para pegar o conteúdo da notícia
-fastify.post('/news-content', async (request, reply) => {
+fastify.get('/content', async (request, reply) => {
   const { url } = request.query as { url: string };
   if (!url) {
     reply.code(400).send({ error: 'URL da notícia é necessária.' });
