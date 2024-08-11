@@ -28,7 +28,7 @@ function limparTextoSemLinks(texto: string): string {
 }
 
 // Função para realizar o web scraping e obter as últimas 10 notícias
-async function scrapeData(): Promise<Article[] | undefined> {
+async function scrapeData(count: number = 10): Promise<Article[]> {
   try {
     const response = await axios.get('https://canalsolar.com.br/noticias/');
     const $ = cheerio.load(response.data);
@@ -36,7 +36,7 @@ async function scrapeData(): Promise<Article[] | undefined> {
     const articles: Article[] = [];
 
     $('.elementor.elementor-527201.e-loop-item').each((index, element) => {
-      if (index < 10) {
+      if (index < count) {
         const title = $(element).find('h3').text().trim();
         const link = $(element).find('a').attr('href');
         let img = $(element).find('a > img').attr('data-lazy-src') || $(element).find('a > img').attr('src');
@@ -52,7 +52,7 @@ async function scrapeData(): Promise<Article[] | undefined> {
     return articles;
   } catch (error) {
     console.error('Erro ao fazer web scraping:', error);
-    return undefined;
+    throw new Error('Erro ao fazer web scraping.');
   }
 }
 
@@ -82,7 +82,8 @@ async function scrapeContent(url: string): Promise<ArticleContent | undefined> {
 
 // Rota para retornar as últimas 10 notícias
 fastify.get('/news', async (request, reply) => {
-  const news = await scrapeData();
+  const { count } = request.query as { count?: number };
+  const news = await scrapeData(count || 10);
   if (news) {
     return news;
   } else {
@@ -91,7 +92,7 @@ fastify.get('/news', async (request, reply) => {
 });
 
 // Rota para pegar o conteúdo da notícia
-fastify.get('/news-content', async (request, reply) => {
+fastify.get('/content', async (request, reply) => {
   const { url } = request.query as { url: string };
   if (!url) {
     reply.code(400).send({ error: 'URL da notícia é necessária.' });
